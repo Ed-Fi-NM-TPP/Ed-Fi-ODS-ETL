@@ -3,6 +3,7 @@
 !EdFi.Ods.BulkLoad.Console/
 !interchange/
 !mappings/
+!README.md
 
 EdFi.Ods.BulkLoad.Console/*
 !EdFi.Ods.BulkLoad.Console/.gitkeep
