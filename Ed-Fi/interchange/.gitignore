@@ -1,0 +1,8 @@
+xml/*
+!xml/.gitkeep
+
+manifest/*
+!manifest/.gitkeep
+
+out/*
+!manifest/.gitkeep
