@@ -1,8 +1,15 @@
-xml/*
-!xml/.gitkeep
+*/
+
+!manifest/
+!out/
+!utility/
+!xml/
 
 manifest/*
 !manifest/.gitkeep
 
 out/*
-!manifest/.gitkeep
+!out/.gitkeep
+
+xml/*
+!xml/.gitkeep
