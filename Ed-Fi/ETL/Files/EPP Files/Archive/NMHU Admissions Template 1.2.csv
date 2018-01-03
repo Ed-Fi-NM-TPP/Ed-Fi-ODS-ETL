@@ -1,0 +1,62 @@
+Institution ID| InstitutionName| Candidate Last Name| Candidate First Name| Candidate Middle Initial| Candidate SSN| Candidate Birth Date| Candidate Ethnicity| Candidate Gender| Candidate Admission Status| Candidate Admitting GPA| Candidate ACT| Candidate SAT| Has Taken Essential Skills Subtest I| Has Passed Essential Skills Subtest I| Score Subtest I| Has Taken Essential Skills Subtest II| Has Passed Essential Skills Subtest II| Score Subtest II| Has Taken Essential Skills Subtest III| Has Passed Essential Skills Subtest III| Score Subtest III| Program Type (Trad or Alt -- Undergrad or Postgrad)| Program Area1 (Elementary, Special, Secondary, Early Childhood, Health, PE, Art)| Program1 Subject Area1| Program1 Subject Area2| Program2 Area (Elementary, Special, Secondary, Early Childhood, Health, PE, Art)| Program2 Subject Area (Secondary)| TESOL/Bilingual Minor1| TESOL/Bilingual Minor2| Other Minor1| Other Minor2| Program1 Start Month| Program1 Start Year| Expected Program1 End Month| Expected Program1 End Year
+"57"|New Mexico Highlands University|Bailey|Danielle|K|"55761"|1987/04/27||Female|Not Fully Admitted|3.46||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Becker|Forrest|C|"33936"|1986/12/02||Male|Not Fully Admitted|2.69||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Cuadra|Shelby||"32495"|1991/08/20||Female|Not Fully Admitted|2.53||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Griner|Elizabeth|A|"65681"|1984/04/19||Female|Not Fully Admitted|2.75||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Jencik|Tracy|F|"23358"|1987/11/12||Female|Not Fully Admitted|3.25||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Monarrez|Gerardo||"13386"|1989/03/21||Male|Not Fully Admitted|2.77||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Sartori|Kelley|C|"33369"|1975/01/16||Female|Not Fully Admitted|3.79||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Baca|David|A|"17049"|1977/09/28||Male|Fully Admitted|3.64||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Davies|Samuel|A|"19975"|1987/09/20||Male|Fully Admitted|3.2||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Hibben|Matthew|F|"97957"|1976/03/28||Male|Fully Admitted|3.4||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Lahoff|Alec||"10352"|1981/09/26||Male|Fully Admitted|3.4||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Miller|Anna|H|"12988"|1991/04/09||Female|Fully Admitted|3.59||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Natanauan-Lopez|Michael|A|"78715"|1988/05/26||Male|Fully Admitted|3.52||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Noto|Stephanie|D|"30244"|1984/09/04||Female|Fully Admitted|3.56||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Varland|David|E|"47580"|1966/04/07||Male|Fully Admitted|3.59||||||||||||Alternative graduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Archuleta|Julissa|T|"76788"|1995/09/01||Female|Fully Admitted|3.64||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Dilworth|Destiny|T|"89720"|1994/04/22||Female|Fully Admitted|3.58||||||||||||Traditional undergraduate|"Secondary"|PE||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Olivar|Temrie|A|"70956"|1992/12/08||Female|Fully Admitted|3.57||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Armijo|Aspen|C|"39551"|1989/10/27||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Armijo|Robert|E|"59359"|1988/07/08||Male|Fully Admitted|2.48||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Baca|Marissa|L|"38645"|1994/06/27||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Early Childhood"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Barnard|Michelle|A|"08259"|1972/06/24||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Early Childhood"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Candelario|Maria|D|"00000"|1986/08/12||Female|Fully Admitted|3.5||||||||||||Traditional undergraduate|"Secondary"|General Science Education||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Chavez|Alexandra||"97455"|1991/01/15||Female|Fully Admitted|3.5||||||||||||Traditional undergraduate|"Early Childhood"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Dawes|Chantelle|M|"78879"|1977/02/05||Female|Fully Admitted|2.92||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Epler|Naomi|L|"78923"|1992/11/19||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Garay|Neil||"97670"|1978/06/01||Male|Fully Admitted|3||||||||||||Traditional undergraduate|"Special Education"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Gordillo Villa|Claudia|J|"74124"|1989/11/16||Female|Fully Admitted|3.89||||||||||||Traditional undergraduate|"Early Childhood"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Hutchison|James|B|"11485"|1977/05/15||Male|Fully Admitted|3.42||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|James|Ammy|L|"35276"|1973/10/07||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Meyer|Jessica|A|"14079"|1980/07/01||Female|Fully Admitted|-||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Morris-Hammer|Brittany|C|"00611"|1988/07/11||Female|Fully Admitted|3.44||||||||||||Traditional undergraduate|"Early Childhood"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Ortiz|Jennifer|E|"95894"|1979/11/29||Female|Fully Admitted|3.27||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Padilla|Samantha|V|"77306"|1987/10/23||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Spinks|Marissa|A|"12706"|1979/11/26||Female|Fully Admitted|-||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2015|"08"|2015
+"57"|New Mexico Highlands University|Baca|Victoria||"79406"|1987/09/23||Female|Not Fully Admitted|3.1||||||||||||Alternative graduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Chavez|Benjamin|J|"47151"|1990/12/31||Male|Not Fully Admitted|2.79||||||||||||Alternative graduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Hedges|Daniel||"56136"|1979/04/27||Male|Fully Admitted|3.65||||||||||||Alternative graduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Martinez|Francisco|G|"32004"|1989/10/04||Male|Fully Admitted|3.34||||||||||||Alternative graduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Shin|Sang||"46758"|1982/12/12||Female|Fully Admitted|3.4||||||||||||Alternative graduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Shoberg|Marianna|E|"17086"|1971/10/15||Female|Fully Admitted|3.22||||||||||||Alternative graduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Wendt|Rachael|A|"07207"|1983/09/15||Female|Fully Admitted|4||||||||||||Alternative graduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Armijo|Elena|A|"18717"|1994/03/23||Female|Fully Admitted|3.57||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Davis|Cole|T|"85179"|1991/12/10||Male|Fully Admitted|2.56||||||||||||Traditional undergraduate|"Secondary"|History||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Francisco-Mendivil|Delrae|M|"56311"|1985/07/23||Female|Fully Admitted|2.1||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Anderson|Michelle|L|"26601"|1967/04/27||Female|Fully Admitted|3.11||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Blythe|Stephanie|M|"00107"|1988/06/11||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Catanach|Danielle|D|"34315"|1994/06/06||Female|Fully Admitted|-||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Dodson|Ashley|R|"97208"|1993/06/16||Female|Fully Admitted|2.52||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Gonzales|Jessica|L|"10410"|1980/04/12||Female|Fully Admitted|3.6||||||||||||Traditional undergraduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Jackson|Rhea|M|"53698"|1987/09/11||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Jacquez|Ellamarie|H|"36358"|1986/10/24||Female|Fully Admitted|3.48||||||||||||Traditional undergraduate|"Early Childhood"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Jones|Megan||"16857"|1989/06/01||Female|Fully Admitted|-||||||||||||Traditional undergraduate|"Special Education"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Rael|Nadine|M|"33995"|1984/08/27||Female|Fully Admitted|3.75||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Reid|Dwight|E|"98203"|1956/08/17||Male|Fully Admitted|2.33||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Romero|Robin|A|"71914"|1988/10/01||Female|Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Tapia|Lawrence|L|"56957"|1992/04/26||Male|Fully Admitted|2.53||||||||||||Traditional undergraduate|"Secondary"|Biology||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Weatherred|Katelyn|N|"19710"|1989/05/02||Female|Fully Admitted|3.25||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2016|"01"|2016
+"57"|New Mexico Highlands University|Bryant|Lysette|D|"56136"|1992/03/19||Female|Fully Admitted|3.52||||||||||||Traditional undergraduate|"Elementary"|||""||||||"06"|2016|"06"|2016
+"57"|New Mexico Highlands University|Correa|Cassandra|A|"94681"|1994/02/23||Female|Fully Admitted|-||||||||||||Traditional undergraduate|"Elementary"|||""||||||"06"|2016|"06"|2016
+"57"|New Mexico Highlands University|Martinez|Melissa|R|"33750"|1991/08/26||Female|Fully Admitted|3.26||1590||||||||||Traditional undergraduate|"Elementary"|||""||||||"06"|2016|"06"|2016

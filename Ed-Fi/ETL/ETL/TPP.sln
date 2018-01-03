@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "TPP", "TPP\TPP.dtproj", "{CD276C59-5FD3-49ED-8863-421B1CC02784}"
+EndProject
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "EdFi.Etl.20", "EdFi.Etl.20\EdFi.Etl.20.dtproj", "{5C554440-4B50-4FB3-8CE2-66F3AE947F8A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CD276C59-5FD3-49ED-8863-421B1CC02784}.Development|Default.ActiveCfg = Development
+		{CD276C59-5FD3-49ED-8863-421B1CC02784}.Development|Default.Build.0 = Development
+		{5C554440-4B50-4FB3-8CE2-66F3AE947F8A}.Development|Default.ActiveCfg = Development
+		{5C554440-4B50-4FB3-8CE2-66F3AE947F8A}.Development|Default.Build.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

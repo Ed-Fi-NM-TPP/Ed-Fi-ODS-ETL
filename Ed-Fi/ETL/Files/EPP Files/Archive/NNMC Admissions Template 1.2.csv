@@ -1,0 +1,82 @@
+Institution ID| InstitutionName| Candidate Last Name| Candidate First Name| Candidate Middle Initial| Candidate SSN| Candidate Birth Date| Candidate Ethnicity| Candidate Gender| Candidate Admission Status| Candidate Admitting GPA| Candidate ACT| Candidate SAT| Has Taken Essential Skills Subtest I| Has Passed Essential Skills Subtest I| Score Subtest I| Has Taken Essential Skills Subtest II| Has Passed Essential Skills Subtest II| Score Subtest II| Has Taken Essential Skills Subtest III| Has Passed Essential Skills Subtest III| Score Subtest III| Program Type (Trad or Alt -- Undergrad or Postgrad)| Program Area1 (Elementary, Special, Secondary, Early Childhood, Health, PE, Art)| Program1 Subject Area1| Program1 Subject Area2| Program2 Area (Elementary, Special, Secondary, Early Childhood, Health, PE, Art)| Program2 Subject Area (Secondary)| TESOL/Bilingual Minor1| TESOL/Bilingual Minor2| Other Minor1| Other Minor2| Program1 Start Month| Program1 Start Year| Expected Program1 End Month| Expected Program1 End Year
+"72"|Northern New Mexico College|Roybal|Walter||"17050"|1980/03/17|||Fully Admitted|||||||||||||Alternative graduate|"Secondary"|Biology||""||||||"01"|2016|"01"|2017
+"72"|Northern New Mexico College|Maldonado|David|J|"59899"|1992/08/25|||Fully Admitted|||||||||||||Alternative graduate|"Secondary"|Athletic Training||""||||||"01"|2016|"01"|2017
+"72"|Northern New Mexico College|Casados|Amie|E|"48533"|1959/06/27|||Fully Admitted|||||||||||||Alternative graduate|"Elementary"|Home Economics in Business Management||""||||||"01"|2016|"01"|2017
+"72"|Northern New Mexico College|Kilde|Scott|D|"68093"|1961/04/06|||Fully Admitted|||||||||||||Alternative graduate|"Special Education"|Aeroscience Engineering||""||||||"01"|2016|"01"|2017
+"72"|Northern New Mexico College|Armijo|Kelly|A|"95382"|1979/01/22|||Fully Admitted|2.25||||||||||||Alternative graduate|"Secondary"|Business Administration||""||||||"01"|2016|"01"|2017
+"72"|Northern New Mexico College|Casados|Cadie|A|"14591"|1994/02/12|||Fully Admitted|3.7||||||||||||Alternative graduate|"Elementary"|Political Science||""||TESOL||||"01"|2016|"01"|2017
+"72"|Northern New Mexico College|Flores|Jacob|R|"02230"|1992/02/12|||Fully Admitted|4||||||||||||Alternative graduate|"Secondary"|Exercise Science||""||||Athletic Coaching||"01"|2016|"01"|2017
+"72"|Northern New Mexico College|Chavarria|Wilmer|A|"32325"|1989/02/24|||Fully Admitted|||||||||||||Alternative graduate|"Secondary"|Cinematic Arts||""|||Bilingual|||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Vigil|Erika|K|"74926"|1990/08/15|||Fully Admitted|3.17||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Gonzales|Ryan|C|"98111"|1988/12/29|||Fully Admitted|3.83||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Sowell-Lovejoy|Sabra||"65539"|1970/10/16|||Fully Admitted|3.84||||||||||||Alternative graduate|"Elementary"|Art Studio||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Judd|Robert|G|"13664"|1978/09/01|||Fully Admitted|4||||||||||||Alternative graduate|"Elementary"|Psychology||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Khalsa|Sahadri|R|"74752"|1959/04/06|||Fully Admitted|4||||||||||||Alternative graduate|"Special Education"|Business/Accounting||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Saldana|Crystal|R|"53047"|1985/07/29|||Fully Admitted|4.33||||||||||||Traditional undergraduate|"Elementary"|||""||||||"06"|2015|"06"|2016
+"72"|Northern New Mexico College|Salcido|David|J|"72711"|1991/08/12|||Fully Admitted|||||||||||||Alternative graduate|"Secondary"|Surveying Engineering||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Jaramillo|Jennifer||"76673"|1990/08/27|||Fully Admitted|||||||||||||Alternative graduate|"Special Education"|Psychology||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Daniel|David|M|"46336"|1983/10/19|||Fully Admitted|||||||||||||Alternative graduate|"Secondary"|Rhetoric/Writing English||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Cordova|Mercella|R|"76415"|1990/05/11|||Fully Admitted|3.07||||||||||||Alternative graduate|"Secondary"|Wildlife/Fisheries Science||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Gabrentina|Arnel|G|"20378"|1968/05/04|||Fully Admitted|3.67||||||||||||Alternative graduate|"Elementary"|Agricultural Education||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Przyllas|Liza|M|"26286"|1960/12/09|||Fully Admitted|3.8||||||||||||Alternative graduate|"Elementary"|Science||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Roaque|Crispin|F|"61585"|1955/06/06|||Fully Admitted|4||||||||||||Alternative graduate|"Secondary"|Criminal Justice||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|McGuire|John|W|"62978"|1982/10/15|||Fully Admitted|4||||||||||||Alternative graduate|"Secondary"|Theatre/Drama||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Salazar|Dorene|C|"98962"|1981/06/16|||Fully Admitted|4||||||||||||Alternative graduate|"Elementary"|Family and Consumer Science||""||||||"08"|2015|"08"|2016
+"72"|Northern New Mexico College|Thrall|Cary|A|"42078"|1981/02/11|||Fully Admitted|4||||||||||||Alternative graduate|"Elementary"|Art||""||||||"01"|2014|"01"|2015
+"72"|Northern New Mexico College|Martinez|Guillermo|A|"39732"|1991/11/30|||Fully Admitted|3||||||||||||Alternative graduate|"Elementary"|Political Science||""||||||"06"|2014|"06"|2015
+"72"|Northern New Mexico College|Espie|Deborah|M|"85778"|1968/08/24|||Fully Admitted|3.67||||||||||||Alternative graduate|"Elementary"|Zoology||""||||||"06"|2014|"06"|2015
+"72"|Northern New Mexico College|Fernandez|Anna|C|"75952"|1986/12/02|||Fully Admitted|3.84||||||||||||Alternative graduate|"Special Education"|Communication||""||||Film||"06"|2014|"06"|2015
+"72"|Northern New Mexico College|Cleary|Caitlin||"24499"|1986/03/09|||Fully Admitted|4||||||||||||Alternative graduate|"Elementary"|Film||""||||Anthropology||"06"|2014|"06"|2015
+"72"|Northern New Mexico College|Horpedahl|Weston|L|"57754"|1976/05/23|||Fully Admitted|0||||||||||||Alternative graduate|"Elementary"|Science||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Abeyta|Wanda|A|"13686"|1989/02/12|||Fully Admitted|3||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Galvan|Angelik|J|"94179"|1996/06/24|||Fully Admitted|3.25||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Weaver|Chrissy|L|"97686"|1975/03/08|||Fully Admitted|3.62||||||||||||Alternative graduate|"Special Education"|Multidisciplinary Studies||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Jones|Rebecca|N|"56862"|1981/12/23|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Hillary Lieberman|Leona||"81811"|1979/10/10|||Fully Admitted|4||||||||||||Alternative graduate|"Special Education"|Art, Child Development,Culture||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Reeves|Makenna|C|"84599"|1986/04/06|||Fully Admitted|4||||||||||||Alternative graduate|"Secondary"|Mathematics||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Salazar|Julie|A|"92617"|1985/11/26|||Fully Admitted|4||||||||||||Alternative graduate|"Elementary"|Criminal Justice||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Salazar|Julie|A|"92617"|1985/11/26|||Fully Admitted|4||||||||||||Alternative graduate|"Secondary"|Criminal Justice||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Marr-Lyon|Lisa|R|"89825"|1973/08/11|||Fully Admitted|4.13||||||||||||Alternative graduate|"Elementary"|Psychology||""||||||"08"|2014|"08"|2015
+"72"|Northern New Mexico College|Maestas|Michaela|D|"59743"|1984/02/17|||Fully Admitted|3.62||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2013|"01"|2014
+"72"|Northern New Mexico College|Torres|Fidel|M|"96883"|1971/12/02|||Fully Admitted|2||||||||||||Alternative graduate|"Secondary"|Guidance and Counseling||""||||||"06"|2013|"06"|2014
+"72"|Northern New Mexico College|Naranjo|Monica|L|"73617"|1975/12/23|||Fully Admitted|3||||||||||||Traditional undergraduate|"Elementary"|||""||||||"07"|2013|"07"|2014
+"72"|Northern New Mexico College|Gallegos|Alicia|M|"72276"|1995/05/11|||Fully Admitted|2.33||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2013|"08"|2014
+"72"|Northern New Mexico College|Matt-Sanchez|Lanell|R|"03430"|1971/03/08|||Fully Admitted|4||||||||||||Alternative graduate|"Secondary"|Anthropology||"Biology"||||||"08"|2013|"08"|2014
+"72"|Northern New Mexico College|Money|Andrew|J|"12282"|1989/02/28|||Fully Admitted|2.04||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2012|"01"|2013
+"72"|Northern New Mexico College|Garcia|Eric|J|"28648"|1992/10/06|||Fully Admitted|2.23||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2012|"08"|2013
+"72"|Northern New Mexico College|Manzanares|Marlina|R|"17780"|1987/01/18|||Fully Admitted|3||||||||||||Alternative graduate|"Elementary"|Film/Video Production||""||TESOL Endorsement||||"08"|2012|"08"|2013
+"72"|Northern New Mexico College|Torrez|Vanessa|S|"50037"|1994/11/14|||Fully Admitted|3.42||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2012|"08"|2013
+"72"|Northern New Mexico College|Martinez|Kimberly|N|"12599"|1994/01/31|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2012|"08"|2013
+"72"|Northern New Mexico College|Dickson|Camille|L|"42030"|1969/02/20|||Fully Admitted|4.33||||||||||||Alternative graduate|"Elementary"|Art||""||||||"08"|2012|"08"|2013
+"72"|Northern New Mexico College|Allison|Nicole|A|"43121"|1985/10/18|||Fully Admitted|1||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2011|"01"|2012
+"72"|Northern New Mexico College|Montoya|Erika|M|"92406"|1975/06/15|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2011|"01"|2012
+"72"|Northern New Mexico College|Olivas|Maria Del Carmen||"20255"|1992/11/14|||Fully Admitted|0||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2011|"08"|2012
+"72"|Northern New Mexico College|Rojo Gomez|Adriana|A|"75845"|1992/10/24|||Fully Admitted|3.67||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2011|"08"|2012
+"72"|Northern New Mexico College|Gutierrez|Andrea|N|"79204"|1988/09/27|||Fully Admitted|3.73||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2010|"01"|2011
+"72"|Northern New Mexico College|Jaramillo|Marlyne|C|"76122"|1990/07/02|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"06"|2010|"06"|2011
+"72"|Northern New Mexico College|Pena|Antima|S|"17776"|1991/07/26|||Fully Admitted|3.33||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2009|"08"|2010
+"72"|Northern New Mexico College|Aguino|Pauline|A|"61168"|1950/10/15|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2008|"01"|2009
+"72"|Northern New Mexico College|Lujan|Jennifer|A|"30414"|1986/07/14|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"06"|2006|"06"|2007
+"72"|Northern New Mexico College|Montoya|Sylvia|R|"19227"|1971/03/11|||Fully Admitted|4.15||||||||||||Traditional undergraduate|"Elementary"|||""||||||"08"|2006|"08"|2007
+"72"|Northern New Mexico College|Martinez Flores|Melissa|E|"11316"|1975/12/14|||Fully Admitted|||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Martinez|Shanay|M|"39715"|1994/07/28|||Fully Admitted|0||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Carmona|Maria|G|"35944"|1991/10/16|||Fully Admitted|0.67||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|De Yapp|Clarence||"31367"|1994/08/10|||Fully Admitted|1.33||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Martinez|Patrick|S|"52143"|1992/05/07|||Fully Admitted|2.07||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Quintana|Tatyana|B|"79128"|1996/01/06|||Fully Admitted|2.39||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Rummel|Jessica|A|"53193"|1992/06/03|||Fully Admitted|2.67||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Ortiz|Angel|S|"97780"|1996/04/22|||Fully Admitted|2.92||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Rosacker|Claudia|R|"99946"|1996/04/20|||Fully Admitted|3.17||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Sanchez|Rebecca|J|"73906"|1988/10/30|||Fully Admitted|3.33||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Pena|Larissa|J|"38171"|1994/09/22|||Fully Admitted|3.42||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Trujillo|Heather|R|"17492"|1994/02/15|||Fully Admitted|3.45||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Salinas|Nitzia|V|"10649"|1996/01/18|||Fully Admitted|3.51||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Gutierrez|Rebecca|N|"99519"|1993/05/31|||Fully Admitted|3.61||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Alarid|Crystal|J|"70734"|1992/12/07|||Fully Admitted|3.73||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Martinez|Leah|N|"59536"|1989/11/21|||Fully Admitted|3.86||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Martinez|Kassandra|O|"34304"|1994/06/02|||Fully Admitted|3.88||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Archuleta|Cristobal|A|"95469"|1990/10/02|||Fully Admitted|3.94||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Vasquez|Marie|M|"17320"|1970/03/02|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Gasca|Yolanda||"49019"|1956/04/01|||Fully Admitted|4||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Krueger|Robert|S|"70023"|1987/07/09|||Fully Admitted|4.11||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
+"72"|Northern New Mexico College|Casias|Twila|B|"05532"|1996/10/21|||Fully Admitted|4.2||||||||||||Traditional undergraduate|"Elementary"|||""||||||"01"|2015|"01"|2016
