@@ -3,7 +3,8 @@ param
     [Parameter(Mandatory=$true)][string]$file
 )
 
-if ($file.IndexOf('Interchange-') -ne 0 -Or !$file.EndsWith('.xml'))
+$re = [regex] '(_\d+|\S+)\.xml$'
+if ($file.IndexOf('Interchange-') -ne 0 -Or !$re.IsMatch($file))
 {
 	Write-Error "$file does not follow the naming convention Interchange-Type.xml or Interchange-Type-Suffix.xml"
 	return
@@ -21,7 +22,8 @@ if ($hyphenPosition -ne -1)
 	$file = $file.Substring(0, $hyphenPosition)
 }
 
-$type = $file
+ $type = $file
+
 
 $command = "$PSScriptRoot\BulkLoadInterchange.ps1"
 
