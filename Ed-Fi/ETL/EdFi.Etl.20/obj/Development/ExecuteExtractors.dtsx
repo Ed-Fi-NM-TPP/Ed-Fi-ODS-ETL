@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="ExecuteExtractors"
   DTS:PackageType="5"
-  DTS:VersionBuild="181"
-  DTS:VersionGUID="{968C00DB-E41E-4B00-BCCE-92171958C341}">
+  DTS:VersionBuild="185"
+  DTS:VersionGUID="{0A539BA0-985A-40F0-8483-601DBAEC1A9D}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -80,7 +80,7 @@
           DTS:RowDelimiter=""
           DTS:TextQualifier="_x003C_none_x003E_"
           DTS:CodePage="1252"
-          DTS:ConnectionString="C:\\Users\\Carlos.Gonzalez\\Documents\\Test\\temp\\StudentProgram-2.0_0_0.xml">
+          DTS:ConnectionString="C:\\Projects\\Ed-Fi\\interchange\\xml\\StudentProgram-2.0_0-0.xml">
           <DTS:FlatFileColumns>
             <DTS:FlatFileColumn
               DTS:ColumnType="Delimited"
@@ -375,12 +375,12 @@ WHERE a.FileName = 'StudentProgram-2.0_0'</DTS:VariableValue>
       DTS:CreationName=""
       DTS:DTSID="{94D34AEB-5EC6-48E5-87D4-D640E493E8CF}"
       DTS:EvaluateAsExpression="True"
-      DTS:Expression="@[User::XMLPath] + @[User::FileName] + &quot;_&quot; + (DT_WSTR,3) @[User::Counter]+ &quot;.xml&quot;"
+      DTS:Expression="@[User::XMLPath] + @[User::FileName] + &quot;-&quot; + (DT_WSTR,3) @[User::Counter]+ &quot;.xml&quot;"
       DTS:IncludeInDebugDump="2345"
       DTS:Namespace="User"
       DTS:ObjectName="XMLFile">
       <DTS:VariableValue
-        DTS:DataType="8">C:\\Users\\Carlos.Gonzalez\\Documents\\Test\\temp\\StudentProgram-2.0_0_0.xml</DTS:VariableValue>
+        DTS:DataType="8">C:\\Projects\\Ed-Fi\\interchange\\xml\\StudentProgram-2.0_0-0.xml</DTS:VariableValue>
     </DTS:Variable>
     <DTS:Variable
       DTS:CreationName=""
@@ -411,7 +411,7 @@ WHERE a.FileName = 'StudentProgram-2.0_0'</DTS:VariableValue>
       DTS:Namespace="User"
       DTS:ObjectName="XMLPath">
       <DTS:VariableValue
-        DTS:DataType="8">C:\\Users\\Carlos.Gonzalez\\Documents\\Test\\temp\\</DTS:VariableValue>
+        DTS:DataType="8">C:\\Projects\\Ed-Fi\\interchange\\xml\\</DTS:VariableValue>
     </DTS:Variable>
   </DTS:Variables>
   <DTS:Executables>
@@ -1132,6 +1132,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
           DTS:refId="Package\ForEach Mapping SP\Generate manifest data"
           DTS:CreationName="Microsoft.ExecuteSQLTask"
           DTS:Description="Execute SQL Task"
+          DTS:Disabled="True"
           DTS:DTSID="{EF6C86FF-0B41-4C18-AD67-B03CE003D060}"
           DTS:ExecutableType="Microsoft.ExecuteSQLTask"
           DTS:LocaleID="-1"
@@ -1199,6 +1200,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
           DTS:refId="Package\ForEach Mapping SP\Save manifest to File"
           DTS:CreationName="Microsoft.ScriptTask"
           DTS:Description="Script Task"
+          DTS:Disabled="True"
           DTS:DTSID="{9DA63BE8-DD6E-4F44-B820-B51F520F8F2A}"
           DTS:ExecutableType="Microsoft.ScriptTask"
           DTS:LocaleID="-1"
@@ -1753,6 +1755,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
           DTS:refId="Package\ForEach Mapping SP\Track Generated File"
           DTS:CreationName="Microsoft.ExecuteSQLTask"
           DTS:Description="Execute SQL Task"
+          DTS:Disabled="True"
           DTS:DTSID="{86CE065E-5E65-44E8-B0E9-4ABE1EFDAF52}"
           DTS:ExecutableType="Microsoft.ExecuteSQLTask"
           DTS:LocaleID="-1"
@@ -1908,27 +1911,27 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
       <GraphLayout
         Capacity="32" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="175.2,41.6"
+          Size="175,42"
           Id="Package\ForEach Mapping SP\For Each batch of data in the Interchange\Execute SP mapping"
           TopLeft="5.50000000000001,5.5" />
         <NodeLayout
-          Size="156.8,41.6"
+          Size="157,42"
           Id="Package\ForEach Mapping SP\For Each batch of data in the Interchange\Save XML to File"
           TopLeft="14.5,107.5" />
         <EdgeLayout
           Id="Package\ForEach Mapping SP\For Each batch of data in the Interchange.PrecedenceConstraints[Constraint]"
-          TopLeft="93,47.1">
+          TopLeft="93,47.5">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,60.4"
+              EndConnector="0,60"
               Start="0,0"
-              End="0,52.9">
+              End="0,52.5">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,52.9" />
+                    End="0,52.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -1940,26 +1943,26 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="185.6,204.8"
-          Size="185.6,248"
+          PanelSize="186,205"
+          Size="186,248"
           Id="Package\ForEach Mapping SP\For Each batch of data in the Interchange"
           TopLeft="12.5,107.5" />
         <NodeLayout
-          Size="190.4,41.6"
+          Size="190,42"
           Id="Package\ForEach Mapping SP\Generate manifest data"
           TopLeft="10.5000000000001,415.5" />
         <NodeLayout
-          Size="200,41.6"
+          Size="200,42"
           Id="Package\ForEach Mapping SP\Get Max ForLoop Counter"
           TopLeft="5.5,5.5" />
         <NodeLayout
-          Size="176.8,41.6"
+          Size="177,42"
           Id="Package\ForEach Mapping SP\Save manifest to File"
           TopLeft="17.0000000000001,517.5" />
         <NodeLayout
-          Size="176,41.6"
+          Size="176,42"
           Id="Package\ForEach Mapping SP\Track Generated File"
-          TopLeft="17.5000000000001,619.5" />
+          TopLeft="17.5000000000001,620.5" />
         <EdgeLayout
           Id="Package\ForEach Mapping SP.PrecedenceConstraints[Constraint]"
           TopLeft="105.5,355.5">
@@ -2034,14 +2037,14 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,60"
+              EndConnector="0,61"
               Start="0,0"
-              End="0,52.5">
+              End="0,53.5">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,52.5" />
+                    End="0,53.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -2053,16 +2056,16 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</BinaryItem>
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="211.2,716.8"
-          Size="211.2,760"
+          PanelSize="211,717"
+          Size="211,760"
           Id="Package\ForEach Mapping SP"
           TopLeft="15.0000000000001,209.5" />
         <NodeLayout
-          Size="180.8,41.6"
+          Size="181,42"
           Id="Package\Get StoredProcedures"
           TopLeft="30,107.5" />
         <NodeLayout
-          Size="230.4,41.6"
+          Size="230,42"
           Id="Package\TRUNCATE GeneratedFiles table"
           TopLeft="5.50000000000001,5.5" />
         <EdgeLayout

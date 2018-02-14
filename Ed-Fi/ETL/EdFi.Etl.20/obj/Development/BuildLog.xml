@@ -2,13 +2,13 @@
 <BuildLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <ProjectInfo>
     <Name>EdFi.Etl.20</Name>
-    <LastWriteTime>2017-11-19T18:35:02.2662641Z</LastWriteTime>
+    <LastWriteTime>2018-01-27T05:43:22.6393124Z</LastWriteTime>
     <LastKnownProtectionLevel>EncryptSensitiveWithUserKey</LastKnownProtectionLevel>
   </ProjectInfo>
   <LastBuildInfos>
     <ProjectBuildItemInfo>
       <Name>ExecuteExtractors.dtsx</Name>
-      <LastWriteTime>2017-11-19T19:20:48.7106452Z</LastWriteTime>
+      <LastWriteTime>2018-01-25T11:33:31.4504383Z</LastWriteTime>
       <LastKnownProtectionLevel>EncryptSensitiveWithUserKey</LastKnownProtectionLevel>
     </ProjectBuildItemInfo>
     <ProjectBuildItemInfo>

@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="TruncateEdFiData"
   DTS:PackageType="5"
-  DTS:VersionBuild="30"
-  DTS:VersionGUID="{FFB8CE35-931D-4B68-A5F0-92CFC79C26DD}">
+  DTS:VersionBuild="32"
+  DTS:VersionGUID="{73048235-E7F1-417E-B67F-CAC51A3C80DD}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -24,12 +24,12 @@
       <DTS:PropertyExpression
         DTS:Name="ConnectionString">"Data Source="+ @[$Project::EDFIODS_DB] +";Initial Catalog="+ @[$Project::EDFIODS_DB]  +";Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;"</DTS:PropertyExpression>
       <DTS:PropertyExpression
-        DTS:Name="InitialCatalog">@[$Project::NMEdFiStaging_InitialCatalog]</DTS:PropertyExpression>
+        DTS:Name="InitialCatalog">@[$Project::EDFIODS_DB]</DTS:PropertyExpression>
       <DTS:PropertyExpression
-        DTS:Name="ServerName">@[$Project::NMEdFiStaging_ServerName]</DTS:PropertyExpression>
+        DTS:Name="ServerName">@[$Project::EDFIODS_SERVER]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_Staging;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+          DTS:ConnectionString="Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_FVApuqeYBgIx;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
   </DTS:ConnectionManagers>

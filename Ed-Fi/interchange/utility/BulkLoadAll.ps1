@@ -4,11 +4,11 @@ $Directory = "$PSScriptRoot\..\xml"
 $LoadOrder =@("Descriptors",
  "EducationOrganization","EducationOrgCalendar",
  "MasterSchedule", "StaffAssociation" , 
- "TeacherCandidate-Credential", "TeacherCandidate-Student",
+  "TeacherCandidate-Student", "TeacherCandidate-Credential",
  "TeacherCandidate-TeacherCandidate","TeacherCandidate-TeacherCandidateAcademicRecord",
  "TeacherCandidate-TeacherCandidateFieldworkExperience","TeacherCandidate-TeacherCandidateTeacherPreparationProviderAssociation",
- "TeacherCandidate-TeacherCandidateTeacherPreparationProviderProgramAssociation", 
- "PerformanceMeasure-PerformanceMeasure","PerformanceMeasure-Rubric", "PerformanceMeasure-RubricLevel","PerformanceMeasure-RubricLevelResponse", 
+ "TeacherCandidate-TeacherCandidateTeacherPreparationProviderProgramAssociation",
+ "PerformanceMeasure-Rubric", "PerformanceMeasure-RubricLevel","PerformanceMeasure-PerformanceMeasure","PerformanceMeasure-RubricLevelResponse", 
  "AssessmentMetadata-EssentialSkills","StudentAssessment-EssentialSkills"
  );
  $FileOrder = @{};
