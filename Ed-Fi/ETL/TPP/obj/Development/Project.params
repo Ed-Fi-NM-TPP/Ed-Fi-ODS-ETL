@@ -205,7 +205,7 @@
       <SSIS:Property
         SSIS:Name="Sensitive">0</SSIS:Property>
       <SSIS:Property
-        SSIS:Name="Value">C:\Projects\AMP\FlatFiles\SchoolGradeHistory.xlsx</SSIS:Property>
+        SSIS:Name="Value">C:\Projects\Ed-Fi\ETL\Files\SchoolGradeHistory.xlsx</SSIS:Property>
       <SSIS:Property
         SSIS:Name="DataType">18</SSIS:Property>
     </SSIS:Properties>
@@ -226,7 +226,7 @@
       <SSIS:Property
         SSIS:Name="Sensitive">0</SSIS:Property>
       <SSIS:Property
-        SSIS:Name="Value">EdFi_Ods_Sandbox_Staging</SSIS:Property>
+        SSIS:Name="Value">EdFi_Ods_Sandbox_FVApuqeYBgIx</SSIS:Property>
       <SSIS:Property
         SSIS:Name="DataType">18</SSIS:Property>
     </SSIS:Properties>

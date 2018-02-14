@@ -6,8 +6,8 @@ $Directory = "$PSScriptRoot\..\xml"
    $re = [regex]'Descriptors|Assessment'
     if( !$re.Match($file).Success) {
    
-          Remove-Item $file
-          Write-Host $file
+          Remove-Item $file.FullName
+          Write-Host $file.FullName
    }
    
  }
