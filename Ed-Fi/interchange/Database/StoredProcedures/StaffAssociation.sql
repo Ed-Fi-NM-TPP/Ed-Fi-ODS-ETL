@@ -57,8 +57,7 @@ AS
                                                     a.STAFF_LAST_NM ,
                                                     COALESCE(HISPANIC_IND,
                                                              'No') HISPANIC_IND ,
-                                                    DENSE_RANK() OVER ( PARTITION BY a.STAFF_ID,
-                                                              STAFF_BIRTHDATE ORDER BY B.ORIG_HIRE_DATE DESC ) rowid
+                                                    DENSE_RANK() OVER ( PARTITION BY a.STAFF_ID ORDER BY B.SNAPSHOT_DATE DESC ) rowid
                                            FROM     staging.STAFF a
                                                     INNER JOIN staging.STAFF_SNAPSHOT
                                                     AS B ON B.STAFF_ID = a.STAFF_ID

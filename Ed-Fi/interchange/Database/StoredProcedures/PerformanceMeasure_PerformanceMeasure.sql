@@ -62,11 +62,11 @@ AS
                                                               AND t.TeacherID = te.TeacherID
                                     LEFT JOIN ( SELECT DISTINCT
                                                         a.STAFF_ID ,
-                                                        a.STAFF_BIRTHDATE
+                                                        a.STAFF_BIRTHDATE, ROW_NUMBER() over ( partition by a.Staff_ID  order by SNAPSHOT_DATE) RecentBirthday
                                                 FROM    staging.STAFF a
                                                         INNER JOIN staging.STAFF_SNAPSHOT
                                                         AS ss ON ss.STAFF_KEY = a.STAFF_KEY
-                                              ) staff ON staff.STAFF_ID = t.ExternalStaffID
+                                              ) staff ON staff.STAFF_ID = t.ExternalStaffID AND RecentBirthday = 1
                         ) Temp
               WHERE     Temp.StaffUniqueId IS NOT NULL
             ) a

@@ -29,7 +29,7 @@
         DTS:Name="ServerName">@[$Project::EDFIODS_SERVER]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_Staging;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+          DTS:ConnectionString="Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_FVApuqeYBgIx;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
     <DTS:ConnectionManager
@@ -45,7 +45,7 @@
         DTS:Name="ServerName">@[$Project::EDFIODS_SERVER]</DTS:PropertyExpression>
       <DTS:ObjectData>
         <DTS:ConnectionManager
-          DTS:ConnectionString="Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_Staging;Integrated Security=True;" />
+          DTS:ConnectionString="Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_FVApuqeYBgIx;Integrated Security=True;" />
       </DTS:ObjectData>
     </DTS:ConnectionManager>
     <DTS:ConnectionManager
@@ -125,7 +125,7 @@
       DTS:Namespace="User"
       DTS:ObjectName="EDFIODS_ADO_ConnectionString">
       <DTS:VariableValue
-        DTS:DataType="8">Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_Staging;Integrated Security=True;</DTS:VariableValue>
+        DTS:DataType="8">Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_FVApuqeYBgIx;Integrated Security=True;</DTS:VariableValue>
     </DTS:Variable>
     <DTS:Variable
       DTS:CreationName=""
@@ -136,7 +136,7 @@
       DTS:Namespace="User"
       DTS:ObjectName="EDFIODS_ConnectionString">
       <DTS:VariableValue
-        DTS:DataType="8">Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_Staging;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</DTS:VariableValue>
+        DTS:DataType="8">Data Source=PED-UDP_DB;Initial Catalog=EdFi_Ods_Sandbox_FVApuqeYBgIx;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;</DTS:VariableValue>
     </DTS:Variable>
     <DTS:Variable
       DTS:CreationName=""
