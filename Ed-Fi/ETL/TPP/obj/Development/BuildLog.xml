@@ -2,7 +2,7 @@
 <BuildLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <ProjectInfo>
     <Name>TPP</Name>
-    <LastWriteTime>2018-02-10T22:29:23.4679044Z</LastWriteTime>
+    <LastWriteTime>2018-02-27T14:48:10.9768361Z</LastWriteTime>
     <LastKnownProtectionLevel>EncryptSensitiveWithUserKey</LastKnownProtectionLevel>
   </ProjectInfo>
   <LastBuildInfos>
@@ -13,7 +13,7 @@
     </ProjectBuildItemInfo>
     <ProjectBuildItemInfo>
       <Name>Staging.dtsx</Name>
-      <LastWriteTime>2018-02-13T23:29:41.4166016Z</LastWriteTime>
+      <LastWriteTime>2018-02-14T19:18:53.4412963Z</LastWriteTime>
       <LastKnownProtectionLevel>EncryptSensitiveWithUserKey</LastKnownProtectionLevel>
     </ProjectBuildItemInfo>
     <ProjectBuildItemInfo>
@@ -23,7 +23,7 @@
     </ProjectBuildItemInfo>
     <ProjectBuildItemInfo>
       <Name>Metrics.dtsx</Name>
-      <LastWriteTime>2018-02-13T18:56:27.6106249Z</LastWriteTime>
+      <LastWriteTime>2018-02-27T15:47:22.8636602Z</LastWriteTime>
       <LastKnownProtectionLevel>EncryptSensitiveWithUserKey</LastKnownProtectionLevel>
     </ProjectBuildItemInfo>
   </LastBuildInfos>

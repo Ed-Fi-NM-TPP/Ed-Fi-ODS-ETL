@@ -32,7 +32,7 @@ AS
             DROP TABLE staging.TEMPCredential
         END
 
-    SELECT  a.* ,
+ SELECT  a.* ,
             CAST(GETDATE() AS DATE) CurrDate
     INTO    staging.TEMPCredential
     FROM    ( SELECT    * ,
@@ -67,42 +67,143 @@ AS
                                     VerifyCredential.CERT_TYPE_DESC AS 'TypeOfCertification' ,
                                     VerifyCredential.CERT_TYPE_CAT AS 'CredentialCategory' ,
                                     CERT_STATUS AS 'CredentialStatus' ,
-                                    ( SELECT    ( CASE WHEN EPPCredential.OtherMinor1 LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.OtherMinor1
-                                                  END ) AS 'OtherMinor' ,
-                                                ( CASE WHEN EPPCredential.OtherMinor2 LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.OtherMinor2
-                                                  END ) AS 'OtherMinor' ,
-                                                ( CASE WHEN EPPCredential.ProgramArea1 LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.ProgramArea1
-                                                  END ) AS 'ConcentrationArea' ,
-                                                ( CASE WHEN EPPCredential.Program2Area LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.Program2Area
-                                                  END ) AS 'ConcentrationArea' ,
-                                                ( CASE WHEN EPPCredential.Program1SubjectArea1 LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.Program1SubjectArea1
-                                                  END ) AS 'PrimarySubjectArea' ,
-                                                ( CASE WHEN EPPCredential.Program1SubjectArea2 LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.Program1SubjectArea2
-                                                  END ) AS 'PrimarySubjectArea' ,
-                                                ( CASE WHEN EPPCredential.Program2SubjectArea LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.Program2SubjectArea
-                                                  END ) AS 'SecondarySubjectArea' ,
-                                                ( CASE WHEN EPPCredential.BilingualMinor1 LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.BilingualMinor1
-                                                  END ) AS 'BilingualMinor' ,
-                                                ( CASE WHEN EPPCredential.BilingualMinor2 LIKE ''
-                                                       THEN NULL
-                                                       ELSE EPPCredential.BilingualMinor2
-                                                  END ) AS 'BilingualMinor'
+                                    ( SELECT    ( SELECT    Subjects AS 'OtherMinor'
+                                                  FROM      ( SELECT
+                                                              TeacherCandidateIdentifier ,
+                                                              ProgramArea1 ,
+                                                              Program2Area ,
+                                                              Program1SubjectArea1 ,
+                                                              Program1SubjectArea2 ,
+                                                              Program2SubjectArea ,
+                                                              BilingualMinor1 ,
+                                                              BilingualMinor2
+                                                              FROM
+                                                              staging.TeacherCandidates
+                                                            ) unpv UNPIVOT
+													 ( Subjects FOR Programs IN ( [ProgramArea1],
+                                                              [Program2Area],
+                                                              [Program1SubjectArea1],
+                                                              [Program1SubjectArea2],
+                                                              [Program2SubjectArea],
+                                                              [BilingualMinor1],
+                                                              [BilingualMinor2] ) ) r
+                                                  WHERE     Programs LIKE 'OtherMinor[12]'
+                                                            AND Subjects NOT LIKE ''
+                                                            AND r.TeacherCandidateIdentifier = EPPCredential.TeacherCandidateIdentifier
+                                                FOR
+                                                  XML PATH('') ,
+                                                      TYPE
+                                                ) ,
+                                                ( SELECT    Subjects AS 'ConcentrationArea'
+                                                  FROM      ( SELECT
+                                                              TeacherCandidateIdentifier ,
+                                                              ProgramArea1 ,
+                                                              Program2Area ,
+                                                              Program1SubjectArea1 ,
+                                                              Program1SubjectArea2 ,
+                                                              Program2SubjectArea ,
+                                                              BilingualMinor1 ,
+                                                              BilingualMinor2
+                                                              FROM
+                                                              staging.TeacherCandidates
+                                                            ) unpv UNPIVOT
+									 ( Subjects FOR Programs IN ( [ProgramArea1],
+                                                              [Program2Area],
+                                                              [Program1SubjectArea1],
+                                                              [Program1SubjectArea2],
+                                                              [Program2SubjectArea],
+                                                              [BilingualMinor1],
+                                                              [BilingualMinor2] ) ) r
+                                                  WHERE     ( Programs LIKE 'ProgramArea1'
+                                                              OR Programs LIKE 'Program2Area'
+                                                            )
+                                                            AND Subjects NOT LIKE ''
+                                                            AND r.TeacherCandidateIdentifier = EPPCredential.TeacherCandidateIdentifier
+                                                FOR
+                                                  XML PATH('') ,
+                                                      TYPE
+                                                ) ,
+                                                ( SELECT    Subjects AS 'PrimarySubjectArea'
+                                                  FROM      ( SELECT
+                                                              TeacherCandidateIdentifier ,
+                                                              ProgramArea1 ,
+                                                              Program2Area ,
+                                                              Program1SubjectArea1 ,
+                                                              Program1SubjectArea2 ,
+                                                              Program2SubjectArea ,
+                                                              BilingualMinor1 ,
+                                                              BilingualMinor2
+                                                              FROM
+                                                              staging.TeacherCandidates
+                                                            ) unpv UNPIVOT
+														 ( Subjects FOR Programs IN ( [ProgramArea1],
+                                                              [Program2Area],
+                                                              [Program1SubjectArea1],
+                                                              [Program1SubjectArea2],
+                                                              [Program2SubjectArea],
+                                                              [BilingualMinor1],
+                                                              [BilingualMinor2] ) ) r
+                                                  WHERE     Programs LIKE 'Program1SubjectArea[12]'
+                                                            AND Subjects NOT LIKE ''
+                                                            AND r.TeacherCandidateIdentifier = EPPCredential.TeacherCandidateIdentifier
+                                                FOR
+                                                  XML PATH('') ,
+                                                      TYPE
+                                                ) ,
+                                                ( SELECT    Subjects AS 'SecondarySubjectArea'
+                                                  FROM      ( SELECT
+                                                              TeacherCandidateIdentifier ,
+                                                              ProgramArea1 ,
+                                                              Program2Area ,
+                                                              Program1SubjectArea1 ,
+                                                              Program1SubjectArea2 ,
+                                                              Program2SubjectArea ,
+                                                              BilingualMinor1 ,
+                                                              BilingualMinor2
+                                                              FROM
+                                                              staging.TeacherCandidates
+                                                            ) unpv UNPIVOT
+										 ( Subjects FOR Programs IN ( [ProgramArea1],
+                                                              [Program2Area],
+                                                              [Program1SubjectArea1],
+                                                              [Program1SubjectArea2],
+                                                              [Program2SubjectArea],
+                                                              [BilingualMinor1],
+                                                              [BilingualMinor2] ) ) r
+                                                  WHERE     Programs LIKE 'Program2SubjectArea'
+                                                            AND Subjects NOT LIKE ''
+                                                            AND r.TeacherCandidateIdentifier = EPPCredential.TeacherCandidateIdentifier
+                                                FOR
+                                                  XML PATH('') ,
+                                                      TYPE
+                                                ) ,
+                                                ( SELECT    Subjects AS BilingualMinor
+                                                  FROM      ( SELECT
+                                                              TeacherCandidateIdentifier ,
+                                                              ProgramArea1 ,
+                                                              Program2Area ,
+                                                              Program1SubjectArea1 ,
+                                                              Program1SubjectArea2 ,
+                                                              Program2SubjectArea ,
+                                                              BilingualMinor1 ,
+                                                              BilingualMinor2
+                                                              FROM
+                                                              staging.TeacherCandidates
+                                                            ) unpv UNPIVOT
+													 ( Subjects FOR Programs IN ( [ProgramArea1],
+                                                              [Program2Area],
+                                                              [Program1SubjectArea1],
+                                                              [Program1SubjectArea2],
+                                                              [Program2SubjectArea],
+                                                              [BilingualMinor1],
+                                                              [BilingualMinor2] ) ) r
+                                                  WHERE     Programs LIKE 'BilingualMinor1[12]'
+                                                            AND Subjects NOT LIKE ''
+                                                            AND r.TeacherCandidateIdentifier = EPPCredential.TeacherCandidateIdentifier
+                                                FOR
+                                                  XML PATH('') ,
+                                                      TYPE
+                                                )
                                       FROM      staging.TeacherCandidates EPPCredential
                                       WHERE     VerifyCredential.TeacherCandidateIdentifier = EPPCredential.TeacherCandidateIdentifier
                                     FOR
@@ -115,6 +216,7 @@ AS
                                                         CERT_LEVEL_KEY ORDER BY EXPIRATION_DATE DESC ) AS LatestCred
                           FROM      staging.Credential VerifyCredential
                                     INNER JOIN staging.TeacherCandidates EPPCredential ON EPPCredential.TeacherCandidateIdentifier = VerifyCredential.TeacherCandidateIdentifier
+                                                            
                         ) Cred
               WHERE     Cred.LatestCred = 1
             ) a

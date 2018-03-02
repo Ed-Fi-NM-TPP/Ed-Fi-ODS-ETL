@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Staging"
   DTS:PackageType="5"
-  DTS:VersionBuild="296"
-  DTS:VersionGUID="{061A5A56-DA70-49FC-9F72-B60C36BE199B}">
+  DTS:VersionBuild="297"
+  DTS:VersionGUID="{289673FE-8B98-4707-88B8-1117EB95F11F}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -10123,7 +10123,7 @@ FROM    ( SELECT    od.YearEnding ,
                                                          D2C, D2D, D2E, D3A,
                                                          D3B, D3C, D3D, D3E,
                                                          D4A, D4B, D4C, D4D,
-                                                         D4E ) ) unpiv</property>
+                                                         D4E,D4F ) ) unpiv</property>
                     <property
                       dataType="System.String"
                       description="The variable that contains the SQL command to be executed."
@@ -25698,7 +25698,7 @@ WHERE   s.STAFF_BIRTHDATE IS NOT NULL
     design-time-name="Package\SchoolGrade">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="216,42"
           Id="Package\SchoolGrade\SchoolGrade SY1112-SY1516"
@@ -25726,7 +25726,9 @@ WHERE   s.STAFF_BIRTHDATE IS NOT NULL
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>

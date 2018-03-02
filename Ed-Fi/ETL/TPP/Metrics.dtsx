@@ -11,8 +11,8 @@
   DTS:LocaleID="1033"
   DTS:ObjectName="Metrics"
   DTS:PackageType="5"
-  DTS:VersionBuild="279"
-  DTS:VersionGUID="{A04000F6-BBD5-47C6-8FD8-4EF0B577C653}">
+  DTS:VersionBuild="308"
+  DTS:VersionGUID="{34224E71-0379-4604-9B1E-F3B5C21F726F}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -604,18 +604,27 @@ ORDER BY TeacherCandidateIdentifier ASC ,
                       name="SqlCommand"
                       UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  TeacherCandidateIdentifier ,
         EducationOrganizationId ,
-		AcademicSubjectDescriptorId ,
+        AcademicSubjectDescriptorId ,
         MAX([Proficiency Level]) Value
 FROM    staging.TEMPTeacherCandidateStaffStudentAssessments TTC
 WHERE   AcademicSubjectDescription NOT LIKE '%BASIC SKILLS%'
         AND [FileStatus] = 'Completers'
-        AND AdministrationDate BETWEEN EntryDate AND ExitWithdrawDate
+        AND AdministrationDate BETWEEN EntryDate
+                               AND     ExitWithdrawDate
+        AND ExitWithdrawDate BETWEEN CAST(( SELECT  CAST(SchoolYear - 3 AS NVARCHAR(5))
+                                            FROM    edfi.SchoolYearType
+                                            WHERE   currentschoolyear = 1
+                                          ) + '-07-01' AS DATE)
+                             AND     CAST(( SELECT  CAST(SchoolYear AS NVARCHAR(5))
+                                            FROM    edfi.SchoolYearType
+                                            WHERE   currentschoolyear = 1
+                                          ) + '-07-01' AS DATE)
 GROUP BY TeacherCandidateIdentifier ,
         EducationOrganizationId ,
-		AcademicSubjectDescriptorId
+        AcademicSubjectDescriptorId
 ORDER BY TeacherCandidateIdentifier ASC ,
         EducationOrganizationId ASC ,
-		AcademicSubjectDescriptorId ASC</property>
+        AcademicSubjectDescriptorId ASC</property>
                     <property
                       dataType="System.String"
                       description="The variable that contains the SQL command to be executed."
@@ -837,9 +846,11 @@ ORDER BY TeacherCandidateIdentifier ASC ,
                         JOIN metric.ValueType VT ON M.ValueTypeId = VT.ValueTypeId
                WHERE    GT.Name = 'School'
                         AND pvt.MetricId LIKE '%0005%'
-             ),
+             )
+			 ,
         CTE_PreMetricValue
-          AS ( SELECT DISTINCT
+          AS (
+		   SELECT DISTINCT
                         MD.MetricId ,
                         ValueType ,
                         Value ,
@@ -852,42 +863,61 @@ ORDER BY TeacherCandidateIdentifier ASC ,
                                                         MetricId3, MetricId4,
                                                         MetricId5 )
                         LEFT JOIN metric.TeacherCandidateAcademicSubjectEdOrgAssociation SSSA ON MI.MetricInstanceSetKey = SSSA.MetricInstanceSetKey
-             ),
+             )
+			 ,
         EPPLevel
-          AS ( SELECT   S.MetricInstanceSetKey ,
+          AS ( 
+		  SELECT   S.MetricInstanceSetKey ,
                         MI.MetricId ,
+						AcademicSubject ,
                         AVG(CAST(Value AS DECIMAL(10, 2))) MeanVal ,
                         STDEVP(CAST(Value AS DECIMAL(10, 2))) [Standard Deviation] ,
                         COUNT(*) cnt
                FROM     CTE_PreMetricValue MI
                         JOIN metric.School S ON S.SchoolId = MI.SchoolId
                GROUP BY S.MetricInstanceSetKey ,
-                        MI.MetricId
-             ),
+                        MI.MetricId ,
+						AcademicSubject
+          )
+		  ,
         StateLevel
-          AS ( SELECT   L.MetricInstanceSetKey ,
+          AS ( 
+		  SELECT   L.MetricInstanceSetKey ,
                         40005 MetricId ,
+						AcademicSubject ,-- I added this to comply with requirement step 4
                         AVG(CAST(Value AS DECIMAL(10, 2))) MeanVal ,
                         STDEVP(CAST(Value AS DECIMAL(10, 2))) [Standard Deviation] ,
                         COUNT(*) cnt
                FROM     CTE_PreMetricValue MI
                         JOIN metric.School S ON S.SchoolId = MI.SchoolId
                         JOIN metric.StateOrganization L ON L.StateOrganizationId = S.StateOrganizationId
-               GROUP BY L.MetricInstanceSetKey
-             ),
-        zct
-          AS ( SELECT   E.MetricInstanceSetKey ,
+               GROUP BY L.MetricInstanceSetKey,AcademicSubject
+           )
+		    ,
+        z
+          AS ( 
+		  SELECT   E.MetricInstanceSetKey ,
                         E.MetricId ,
+						E.AcademicSubject,
+						E.cnt,
 						CASE WHEN S.[Standard Deviation] = 0 THEN 0 ELSE 
-                        ( ( ( ( E.MeanVal - S.MeanVal )
-                              / S.[Standard Deviation] ) * E.cnt ) / E.cnt ) END zct
+                        ( E.MeanVal - S.MeanVal )
+                              / S.[Standard Deviation]   END z
                FROM     EPPLevel E
-                        CROSS JOIN StateLevel S
-             )
-    SELECT  MetricInstanceSetKey ,
+                       FULL OUTER JOIN StateLevel S ON E.AcademicSubject=S.AcademicSubject
+			  ) ,
+			zct AS (
+			SELECT 
+			z.MetricInstanceSetKey,
+			z.MetricId,
+			SUM(z.z*z.cnt)/sum(z.cnt) as zct
+			FROM z
+			group by z.MetricInstanceSetKey,
+			z.MetricId
+			)
+             SELECT  MetricInstanceSetKey ,
             MetricId ,
-            CAST(( 1 / ( SQRT(2 * PI()) ) ) * ( EXP(-( zct * zct ) / 2) ) AS DECIMAL(6,
-                                                              2)) Value
+             0.5*(1+ dbo.erf(zct/SQRT(2))) Value
     FROM    zct</property>
                     <property
                       dataType="System.String"
@@ -964,10 +994,8 @@ ORDER BY TeacherCandidateIdentifier ASC ,
                           name="MetricId" />
                         <externalMetadataColumn
                           refId="Package\Custom rollups\Metric 20005\MetricIinstance Source.Outputs[OLE DB Source Output].ExternalColumns[Value]"
-                          dataType="numeric"
-                          name="Value"
-                          precision="6"
-                          scale="2" />
+                          dataType="r8"
+                          name="Value" />
                       </externalMetadataColumns>
                     </output>
                     <output
@@ -987,11 +1015,9 @@ ORDER BY TeacherCandidateIdentifier ASC ,
                           name="MetricId" />
                         <outputColumn
                           refId="Package\Custom rollups\Metric 20005\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[Value]"
-                          dataType="numeric"
+                          dataType="r8"
                           lineageId="Package\Custom rollups\Metric 20005\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[Value]"
-                          name="Value"
-                          precision="6"
-                          scale="2" />
+                          name="Value" />
                         <outputColumn
                           refId="Package\Custom rollups\Metric 20005\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
                           dataType="i4"
@@ -1508,6 +1534,7 @@ where [refTable].[SchoolId] = ?</property>
             FROM    extension.TeacherCandidateTeacherPreparationProviderAssociation TCT
                     JOIN extension.TeacherCandidate TC ON TCT.TeacherCandidateIdentifier = TC.TeacherCandidateIdentifier
             WHERE   NMEthnicity IS NOT NULL
+ AND FileStatus = 'Completers'
                     AND TCT.TeacherPreparationProviderId = a.TeacherPreparationProviderId
           ) AS DECIMAL(6, 2)) Value
 FROM    ( SELECT    TCT.TeacherPreparationProviderId ,
@@ -2032,7 +2059,7 @@ where [refTable].[SchoolId] = ?</property>
                       UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  TCT.TeacherPreparationProviderId ,
         '20024' MetricId ,
         --C.PrimarySubjectArea Name ,
-		CPICA.ConcentrationArea Name ,
+		CPICA.ConcentrationArea + '-DEL-'+ CAST(CASE WHEN TCT.EntryDate IS NULL THEN 0 WHEN TCT.EntryDate BETWEEN CAST(CAST(YEAR(TCT.EntryDate) AS nvarchar(4))+'-07-01' AS date) AND CAST(CAST(YEAR(TCT.EntryDate) + 1 AS nvarchar(4))+'-06-30' AS date) THEN YEAR(TCT.EntryDate) + 1 ELSE YEAR(TCT.EntryDate) END AS nvarchar(5)) Name ,
         COUNT(DISTINCT TC.TeacherCandidateIdentifier) Value
 FROM    extension.TeacherCandidateTeacherPreparationProviderAssociation TCT
         JOIN extension.TeacherCandidate TC ON TCT.TeacherCandidateIdentifier = TC.TeacherCandidateIdentifier
@@ -2042,7 +2069,7 @@ FROM    extension.TeacherCandidateTeacherPreparationProviderAssociation TCT
 WHERE   FileStatus = 'Completers'
         AND CPICA.ConcentrationArea IS NOT NULL
 GROUP BY TCT.TeacherPreparationProviderId ,
-        CPICA.ConcentrationArea</property>
+        CPICA.ConcentrationArea + '-DEL-'+ CAST(CASE WHEN TCT.EntryDate IS NULL THEN 0 WHEN TCT.EntryDate BETWEEN CAST(CAST(YEAR(TCT.EntryDate) AS nvarchar(4))+'-07-01' AS date) AND CAST(CAST(YEAR(TCT.EntryDate) + 1 AS nvarchar(4))+'-06-30' AS date) THEN YEAR(TCT.EntryDate) + 1 ELSE YEAR(TCT.EntryDate) END AS nvarchar(5))</property>
                     <property
                       dataType="System.String"
                       description="The variable that contains the SQL command to be executed."
@@ -2133,7 +2160,7 @@ GROUP BY TCT.TeacherPreparationProviderId ,
                         <externalMetadataColumn
                           refId="Package\Custom rollups\Metric 20024\Source EPP Metrics.Outputs[OLE DB Source Output].ExternalColumns[Name]"
                           dataType="wstr"
-                          length="60"
+                          length="70"
                           name="Name" />
                         <externalMetadataColumn
                           refId="Package\Custom rollups\Metric 20024\Source EPP Metrics.Outputs[OLE DB Source Output].ExternalColumns[Value]"
@@ -2161,7 +2188,7 @@ GROUP BY TCT.TeacherPreparationProviderId ,
                         <outputColumn
                           refId="Package\Custom rollups\Metric 20024\Source EPP Metrics.Outputs[OLE DB Source Error Output].Columns[Name]"
                           dataType="wstr"
-                          length="60"
+                          length="70"
                           lineageId="Package\Custom rollups\Metric 20024\Source EPP Metrics.Outputs[OLE DB Source Error Output].Columns[Name]"
                           name="Name" />
                         <outputColumn
@@ -3930,7 +3957,7 @@ GROUP BY mi.metricinstancesetkey ,
                       name="SqlCommand"
                       UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  mi.metricinstancesetkey ,
         20029 metricid ,
-        MIN(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MIN(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.metricinstance mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 JOIN metric.domain d on d.domainid = m.domainid
@@ -3939,7 +3966,7 @@ GROUP BY mi.metricinstancesetkey
 UNION
 SELECT  mi.metricinstancesetkey ,
         20030 metricid ,
-        MAX(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MAX(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.metricinstance mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 JOIN metric.domain d on d.domainid = m.domainid
@@ -4400,8 +4427,8 @@ GROUP BY mi.metricinstancesetkey</property>
 --UNION
 SELECT  mi.metricinstancesetkey ,
         20029 metricid ,
-		CAST(mi.metricid AS NVARCHAR(7))  name ,
-        MIN(CAST(mi.value AS NUMERIC(6, 3)))  value
+		TRY_CAST(mi.metricid AS NVARCHAR(7))  name ,
+        MIN(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.metricinstance mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 --JOIN metric.domain d on d.domainid = m.domainid
@@ -4411,8 +4438,8 @@ GROUP BY mi.metricinstancesetkey ,
 UNION
 SELECT  mi.metricinstancesetkey ,
         20030 metricid ,
-		CAST(mi.metricid AS NVARCHAR(7))  name ,
-        MAX(CAST(mi.value AS NUMERIC(6, 3)))  value
+		TRY_CAST(mi.metricid AS NVARCHAR(7))  name ,
+        MAX(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.metricinstance mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 --JOIN metric.domain d on d.domainid = m.domainid
@@ -5011,14 +5038,26 @@ GROUP BY Metricid, SO.MetricInstanceSetKey</property>
                       dataType="System.String"
                       description="The SQL command to be executed."
                       name="SqlCommand"
-                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  SO.metricinstancesetkey ,
+                      UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">--SELECT  SO.metricinstancesetkey ,
+--        40028 metricid ,
+--        AVG(CAST(mi.value AS NUMERIC(6, 3)))  value
+--FROM    metric.metricinstance mi
+--JOIN metric.metric m ON mi.metricid = m.metricid
+--JOIN metric.School S ON S.metricinstancesetkey = mi.metricinstancesetkey
+--JOIN metric.StateOrganization SO ON SO.StateOrganizationId = S.StateOrganizationId
+--WHERE   mi.metricid = 20028
+--GROUP BY SO.metricinstancesetkey;
+
+
+SELECT  SO.metricinstancesetkey ,
         40028 metricid ,
-        AVG(CAST(mi.value AS NUMERIC(6, 3)))  value
-FROM    metric.metricinstance mi
-JOIN metric.metric m ON mi.metricid = m.metricid
-JOIN metric.School S ON S.metricinstancesetkey = mi.metricinstancesetkey
-JOIN metric.StateOrganization SO ON SO.StateOrganizationId = S.StateOrganizationId
-WHERE   mi.metricid = 20028
+        CAST(SUM(CAST ([Value] AS INT)) AS DECIMAL)
+        / CAST(COUNT(mi.MetricInstanceSetKey) AS DECIMAL) AS value
+FROM    [metric].[MetricInstance] MI
+        JOIN metric.TeacherCandidateEdOrgAssociation TC ON MI.MetricInstanceSetKey = TC.MetricInstanceSetKey
+        JOIN metric.School S ON S.SchoolId = TC.EducationOrganizationId
+        JOIN metric.StateOrganization SO ON SO.StateOrganizationId = S.StateOrganizationId
+WHERE   metricid BETWEEN 10000 AND 10015
 GROUP BY SO.metricinstancesetkey</property>
                     <property
                       dataType="System.String"
@@ -5099,8 +5138,8 @@ GROUP BY SO.metricinstancesetkey</property>
                           refId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Output].ExternalColumns[value]"
                           dataType="numeric"
                           name="value"
-                          precision="38"
-                          scale="6" />
+                          precision="37"
+                          scale="19" />
                       </externalMetadataColumns>
                     </output>
                     <output
@@ -5119,13 +5158,6 @@ GROUP BY SO.metricinstancesetkey</property>
                           lineageId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[metricid]"
                           name="metricid" />
                         <outputColumn
-                          refId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[value]"
-                          dataType="numeric"
-                          lineageId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[value]"
-                          name="value"
-                          precision="38"
-                          scale="6" />
-                        <outputColumn
                           refId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
                           dataType="i4"
                           lineageId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
@@ -5137,6 +5169,13 @@ GROUP BY SO.metricinstancesetkey</property>
                           lineageId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
                           name="ErrorColumn"
                           specialFlags="2" />
+                        <outputColumn
+                          refId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[value]"
+                          dataType="numeric"
+                          lineageId="Package\Custom rollups\Metric 40028\MetricIinstance Source.Outputs[OLE DB Source Error Output].Columns[value]"
+                          name="value"
+                          precision="37"
+                          scale="19" />
                       </outputColumns>
                       <externalMetadataColumns />
                     </output>
@@ -5453,15 +5492,50 @@ GROUP BY SO.metricinstancesetkey</property>
                       name="SqlCommand"
                       UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  SO.metricinstancesetkey ,
         40028 metricid ,
-		mi.name ,
-        AVG(CAST(mi.value AS NUMERIC(6, 3)))  value
-FROM    metric.MetricInstanceExtendedProperty mi
-JOIN metric.metric m ON mi.metricid = m.metricid
-JOIN metric.School S ON S.metricinstancesetkey = mi.metricinstancesetkey
-JOIN metric.StateOrganization SO ON SO.StateOrganizationId = S.StateOrganizationId
-WHERE   mi.metricid = 20028
+        CAST(D.Name AS nvarchar(50)) name ,
+        CAST(SUM(CAST ([Value] AS INT)) AS DECIMAL)
+        / CAST(COUNT(mi.MetricInstanceSetKey) AS DECIMAL) AS value
+FROM    [metric].[MetricInstance] MI
+        JOIN metric.TeacherCandidateEdOrgAssociation TC ON MI.MetricInstanceSetKey = TC.MetricInstanceSetKey
+        JOIN metric.School S ON S.SchoolId = TC.EducationOrganizationId
+        JOIN metric.StateOrganization SO ON SO.StateOrganizationId = S.StateOrganizationId
+		join metric.Metric m ON MI.MetricId = m.MetricId
+		JOIN metric.Domain D ON D.DomainId = m.DomainId
+WHERE   MI.metricid BETWEEN 10000 AND 10015 AND MI.MetricId!=10005
 GROUP BY SO.metricinstancesetkey ,
-		mi.name</property>
+        D.Name
+UNION
+SELECT  SO.metricinstancesetkey ,
+        40028 metricid ,
+        CAST([MetricId] + 10000 AS nvarchar(50)) name ,
+        CAST(SUM(CAST ([Value] AS INT)) AS DECIMAL)
+        / CAST(COUNT(mi.MetricInstanceSetKey) AS DECIMAL) AS value
+FROM    [metric].[MetricInstance] MI
+        JOIN metric.TeacherCandidateEdOrgAssociation TC ON MI.MetricInstanceSetKey = TC.MetricInstanceSetKey
+        JOIN metric.School S ON S.SchoolId = TC.EducationOrganizationId
+        JOIN metric.StateOrganization SO ON SO.StateOrganizationId = S.StateOrganizationId
+WHERE   metricid BETWEEN 10000 AND 10015
+GROUP BY SO.metricinstancesetkey ,
+        MetricId
+UNION
+SELECT  SO.metricinstancesetkey ,
+        40028 metricid ,
+        CAST([MetricId] AS nvarchar(50)) name ,
+        CAST(SUM(CAST ([Value] AS numeric(6,3))) AS DECIMAL)
+        / CAST(COUNT(mi.MetricInstanceSetKey) AS DECIMAL) AS value
+FROM    [metric].[MetricInstance] MI
+        JOIN metric.School S ON S.MetricInstanceSetKey = MI.MetricInstanceSetKey
+        JOIN metric.StateOrganization SO ON SO.StateOrganizationId = S.StateOrganizationId
+WHERE   metricid IN (20001,20002,20004,20008,20009)
+GROUP BY SO.metricinstancesetkey ,
+        MetricId
+--hardcode 20005 to 0.5
+UNION
+SELECT  SO.metricinstancesetkey ,
+        40028 metricid ,
+        '20005' as name,
+        0.5 AS value
+FROM    metric.StateOrganization SO</property>
                     <property
                       dataType="System.String"
                       description="The variable that contains the SQL command to be executed."
@@ -5516,6 +5590,16 @@ GROUP BY SO.metricinstancesetkey ,
                           name="metricid"
                           truncationRowDisposition="FailComponent" />
                         <outputColumn
+                          refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].Columns[name]"
+                          dataType="wstr"
+                          errorOrTruncationOperation="Conversion"
+                          errorRowDisposition="FailComponent"
+                          externalMetadataColumnId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].ExternalColumns[name]"
+                          length="50"
+                          lineageId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].Columns[name]"
+                          name="name"
+                          truncationRowDisposition="FailComponent" />
+                        <outputColumn
                           refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].Columns[value]"
                           dataType="numeric"
                           errorOrTruncationOperation="Conversion"
@@ -5525,16 +5609,6 @@ GROUP BY SO.metricinstancesetkey ,
                           name="value"
                           precision="38"
                           scale="3"
-                          truncationRowDisposition="FailComponent" />
-                        <outputColumn
-                          refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].Columns[name]"
-                          dataType="wstr"
-                          errorOrTruncationOperation="Conversion"
-                          errorRowDisposition="FailComponent"
-                          externalMetadataColumnId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].ExternalColumns[name]"
-                          length="50"
-                          lineageId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].Columns[name]"
-                          name="name"
                           truncationRowDisposition="FailComponent" />
                       </outputColumns>
                       <externalMetadataColumns
@@ -5548,16 +5622,16 @@ GROUP BY SO.metricinstancesetkey ,
                           dataType="i4"
                           name="metricid" />
                         <externalMetadataColumn
+                          refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].ExternalColumns[name]"
+                          dataType="wstr"
+                          length="50"
+                          name="name" />
+                        <externalMetadataColumn
                           refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].ExternalColumns[value]"
                           dataType="numeric"
                           name="value"
-                          precision="38"
-                          scale="6" />
-                        <externalMetadataColumn
-                          refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].ExternalColumns[name]"
-                          dataType="wstr"
-                          length="250"
-                          name="name" />
+                          precision="37"
+                          scale="19" />
                       </externalMetadataColumns>
                     </output>
                     <output
@@ -5578,16 +5652,9 @@ GROUP BY SO.metricinstancesetkey ,
                         <outputColumn
                           refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[name]"
                           dataType="wstr"
-                          length="250"
+                          length="50"
                           lineageId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[name]"
                           name="name" />
-                        <outputColumn
-                          refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[value]"
-                          dataType="numeric"
-                          lineageId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[value]"
-                          name="value"
-                          precision="38"
-                          scale="6" />
                         <outputColumn
                           refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[ErrorCode]"
                           dataType="i4"
@@ -5600,6 +5667,13 @@ GROUP BY SO.metricinstancesetkey ,
                           lineageId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[ErrorColumn]"
                           name="ErrorColumn"
                           specialFlags="2" />
+                        <outputColumn
+                          refId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[value]"
+                          dataType="numeric"
+                          lineageId="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Error Output].Columns[value]"
+                          name="value"
+                          precision="37"
+                          scale="19" />
                       </outputColumns>
                       <externalMetadataColumns />
                     </output>
@@ -5662,7 +5736,7 @@ GROUP BY SO.metricinstancesetkey ,
                       name="SqlCommand"
                       UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  SO.metricinstancesetkey ,
         40029 metricid ,
-        MIN(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MIN(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.metricinstance mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 CROSS JOIN metric.StateOrganization SO
@@ -5671,7 +5745,7 @@ GROUP BY SO.metricinstancesetkey
 UNION
 SELECT  SO.metricinstancesetkey ,
         40030 metricid ,
-        MAX(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MAX(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.metricinstance mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 CROSS JOIN metric.StateOrganization SO
@@ -6030,7 +6104,7 @@ GROUP BY SO.metricinstancesetkey</property>
                         <inputColumn
                           refId="Package\Custom rollups\Metric 40029, 40030\MetricInstanceExtendedProperty Destination.Inputs[OLE DB Destination Input].Columns[name]"
                           cachedDataType="wstr"
-                          cachedLength="50"
+                          cachedLength="250"
                           cachedName="name"
                           externalMetadataColumnId="Package\Custom rollups\Metric 40029, 40030\MetricInstanceExtendedProperty Destination.Inputs[OLE DB Destination Input].ExternalColumns[Name]"
                           lineageId="Package\Custom rollups\Metric 40029, 40030\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].Columns[name]" />
@@ -6111,7 +6185,7 @@ GROUP BY SO.metricinstancesetkey</property>
                       UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  SO.metricinstancesetkey ,
         40029 metricid ,
 		mi.name ,
-        MIN(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MIN(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.MetricInstanceExtendedProperty mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 CROSS JOIN metric.StateOrganization SO
@@ -6123,7 +6197,7 @@ UNION
 SELECT  SO.metricinstancesetkey ,
         40030 metricid ,
 		mi.name ,
-        MAX(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MAX(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.MetricInstanceExtendedProperty mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 CROSS JOIN metric.StateOrganization SO
@@ -6135,7 +6209,7 @@ UNION
 SELECT  SO.metricinstancesetkey ,
         40029 metricid ,
 		mi.name ,
-        MIN(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MIN(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.MetricInstanceExtendedProperty mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 CROSS JOIN metric.StateOrganization SO
@@ -6147,7 +6221,7 @@ UNION
 SELECT  SO.metricinstancesetkey ,
         40030 metricid ,
 		mi.name ,
-        MAX(CAST(mi.value AS NUMERIC(6, 3)))  value
+        MAX(TRY_CAST(mi.value AS NUMERIC(6, 3)))  value
 FROM    metric.MetricInstanceExtendedProperty mi
 JOIN metric.metric m ON mi.metricid = m.metricid
 CROSS JOIN metric.StateOrganization SO
@@ -6225,7 +6299,7 @@ GROUP BY SO.metricinstancesetkey ,
                           errorOrTruncationOperation="Conversion"
                           errorRowDisposition="FailComponent"
                           externalMetadataColumnId="Package\Custom rollups\Metric 40029, 40030\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].ExternalColumns[name]"
-                          length="50"
+                          length="250"
                           lineageId="Package\Custom rollups\Metric 40029, 40030\MetricInstanceExtendedProperty Source.Outputs[OLE DB Source Output].Columns[name]"
                           name="name"
                           truncationRowDisposition="FailComponent" />
@@ -6505,12 +6579,13 @@ GROUP BY SO.metricinstancesetkey ,
 		WHEN mi.metricid &lt; 40000 THEN '30018'
 		else '40018' END metricid ,
         mi.metricid Name ,
-        CAST(CAST(mi.value AS NUMERIC(6, 3))
-        * CAST(m.pointspossible AS NUMERIC(6, 3)) AS NUMERIC(6, 3)) Value
+        TRY_CAST(TRY_CAST(mi.value AS NUMERIC(6, 3))
+        * TRY_CAST(m.pointspossible AS NUMERIC(6, 3)) AS NUMERIC(6, 3)) Value
 FROM    metric.metricinstance mi
         JOIN metric.metric m ON m.metricid = mi.metricid
-WHERE   ISNUMERIC(mi.value) = 1
-        AND mi.metricid &gt;= 20000</property>
+WHERE   TRY_CAST(mi.value AS numeric(6,3)) IS NOT NULL
+        AND mi.metricid &gt;= 20000 
+		AND m.PointsPossible is not null</property>
                     <property
                       dataType="System.String"
                       description="The variable that contains the SQL command to be executed."
@@ -14345,7 +14420,7 @@ JOIN edfi.StaffSchoolAssociation SA ON SA.StaffUSI = S.StaffUSI
           <DTS:ObjectData>
             <SQLTask:SqlTaskData
               SQLTask:Connection="{38F034EF-61D4-47DA-A8DF-113D72D69832}"
-              SQLTask:SqlStatementSource="IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'TEMPTeacherCandidateStaffStudentAssessments')&#xA;DROP TABLE staging.TEMPTeacherCandidateStaffStudentAssessments ;&#xA;&#xA;SELECT  DISTINCT pvt.AssessmentTitle ,&#xA;        pvt.AssessedGradeLevelDescriptorId ,&#xA;        pvt.AcademicSubjectDescriptorId ,&#xA;        pvt.Version ,&#xA;        pvt.AdministrationDate ,&#xA;&#x9;&#x9;TC.TeacherCandidateIdentifier ,&#xA;&#x9;&#x9;S.StaffUSI ,&#xA;&#x9;&#x9;PVT.StudentUSI ,&#xA;        [Pass-fail] ,&#xA;&#x9;&#x9;pvt.[Proficiency Level] ,&#xA;&#x9;&#x9;FileStatus ,&#xA;&#x9;&#x9;TCTPPA.TeacherPreparationProviderId EducationOrganizationId ,&#xA;&#x9;&#x9;TCTPPA.SchoolYear ,&#xA;&#x9;&#x9;ASDD.Description AcademicSubjectDescription ,&#xA;&#x9;&#x9;CASE WHEN S.StaffUSI IS NULL THEN 'NOTTEACHING' ELSE 'TEACHING' END FoundTeaching ,&#xA;&#x9;&#x9;CASE WHEN [Proficiency Level] IS NULL AND S.StaffUSI IS NULL THEN 'MISSING'&#xA;&#x9;&#x9; WHEN [Proficiency Level] IS NOT NULL AND S.StaffUSI IS NULL THEN 'TESTEDNOTADMITTED'&#xA;&#x9;&#x9; WHEN [Proficiency Level] IS NULL AND S.StaffUSI IS NOT NULL THEN 'ADMITTEDNOTTESTED'&#xA;&#x9;&#x9; WHEN [Proficiency Level] IS NOT NULL AND S.StaffUSI IS NOT NULL THEN 'ADMITTEDANDTESTED' END [Status],&#xA;&#x9;&#x9; TCTPPA.EntryDate,&#xA;&#x9;&#x9; TCTPPA.ExitWithdrawDate&#xA;&#x9;&#x9;INTO staging.TEMPTeacherCandidateStaffStudentAssessments &#xA;FROM    extension.TeacherCandidate tc &#xA;&#x9;&#x9;LEFT JOIN (SELECT * FROM (SELECT AcademicSubjectDescriptorId, StudentUSI, AdministrationDate, Version, AssessedGradeLevelDescriptorId, AssessmentTitle, Result, ARMT.Description&#xA;&#x9;&#x9;  FROM edfi.StudentAssessmentScoreResult ASCR&#xA;        JOIN ( SELECT   AssessmentReportingMethodTypeId AssessmentReportingMethodTypeIdd ,&#xA;                        Description&#xA;               FROM     edfi.AssessmentReportingMethodType&#xA;               WHERE    Description IN ( 'Proficiency Level', 'Pass-fail' )&#xA;             ) ARMT ON ASCR.AssessmentReportingMethodTypeId = ARMT.AssessmentReportingMethodTypeIdd ) A&#xA;&#x9;&#x9;PIVOT ( MAX(a.Result) FOR a.Description IN ( [Proficiency Level],&#xA;                                                              [Pass-fail] ) ) PVT) PVT ON TC.StudentUSI = pvt.StudentUSI&#xA;        LEFT JOIN edfi.Descriptor ASDD ON PVT.AcademicSubjectDescriptorId = ASDD.DescriptorId     &#xA;&#x9;&#x9;JOIN  extension.TeacherCandidateTeacherPreparationProviderAssociation TCTPPA ON TC.TeacherCandidateIdentifier = TCTPPA.TeacherCandidateIdentifier&#xA;        LEFT JOIN edfi.Staff s ON TC.TeacherCandidateIdentifier = S.StaffUniqueId;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+              SQLTask:SqlStatementSource="IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = N'TEMPTeacherCandidateStaffStudentAssessments')&#xA;DROP TABLE staging.TEMPTeacherCandidateStaffStudentAssessments ;&#xA;&#xA;SELECT  DISTINCT pvt.AssessmentTitle ,&#xA;        pvt.AssessedGradeLevelDescriptorId ,&#xA;        pvt.AcademicSubjectDescriptorId ,&#xA;        pvt.Version ,&#xA;        pvt.AdministrationDate ,&#xA;&#x9;&#x9;TC.TeacherCandidateIdentifier ,&#xA;&#x9;&#x9;S.StaffUSI ,&#xA;&#x9;&#x9;PVT.StudentUSI ,&#xA;        [Pass-fail] ,&#xA;&#x9;&#x9;pvt.[Proficiency Level] ,&#xA;&#x9;&#x9;FileStatus ,&#xA;&#x9;&#x9;TCTPPA.TeacherPreparationProviderId EducationOrganizationId ,&#xA;&#x9;&#x9;TCTPPA.SchoolYear ,&#xA;&#x9;&#x9;ASDD.Description AcademicSubjectDescription ,&#xA;&#x9;&#x9;CASE WHEN S.StaffUSI IS NULL THEN 'NOTTEACHING' ELSE 'TEACHING' END FoundTeaching ,&#xA;&#x9;&#x9;--CASE WHEN [Proficiency Level] IS NULL AND S.StaffUSI IS NULL THEN 'MISSING'&#xA;        -- WHEN [Proficiency Level] IS NOT NULL AND S.StaffUSI IS NULL THEN 'TESTEDNOTADMITTED'&#xA;        -- WHEN [Proficiency Level] IS NULL AND S.StaffUSI IS NOT NULL THEN 'ADMITTEDNOTTESTED'&#xA;        -- WHEN [Proficiency Level] IS NOT NULL AND S.StaffUSI IS NOT NULL THEN 'ADMITTEDANDTESTED' END [Status],&#xA;&#x9;&#x9; CASE WHEN [Proficiency Level] IS NULL THEN 'ADMITTEDNOTTESTED'&#xA;         WHEN [Proficiency Level] IS NOT NULL THEN 'ADMITTEDANDTESTED' END [Status],&#xA;&#x9;&#x9; TCTPPA.EntryDate,&#xA;&#x9;&#x9; TCTPPA.ExitWithdrawDate&#xA;&#x9;&#x9;INTO staging.TEMPTeacherCandidateStaffStudentAssessments &#xA;FROM    extension.TeacherCandidate tc &#xA;&#x9;&#x9;LEFT JOIN (SELECT * FROM (SELECT AcademicSubjectDescriptorId, StudentUSI, AdministrationDate, Version, AssessedGradeLevelDescriptorId, AssessmentTitle, Result, ARMT.Description&#xA;&#x9;&#x9;  FROM edfi.StudentAssessmentScoreResult ASCR&#xA;        JOIN ( SELECT   AssessmentReportingMethodTypeId AssessmentReportingMethodTypeIdd ,&#xA;                        Description&#xA;               FROM     edfi.AssessmentReportingMethodType&#xA;               WHERE    Description IN ( 'Proficiency Level', 'Pass-fail' )&#xA;             ) ARMT ON ASCR.AssessmentReportingMethodTypeId = ARMT.AssessmentReportingMethodTypeIdd ) A&#xA;&#x9;&#x9;PIVOT ( MAX(a.Result) FOR a.Description IN ( [Proficiency Level],&#xA;                                                              [Pass-fail] ) ) PVT) PVT ON TC.StudentUSI = pvt.StudentUSI&#xA;        LEFT JOIN edfi.Descriptor ASDD ON PVT.AcademicSubjectDescriptorId = ASDD.DescriptorId     &#xA;&#x9;&#x9;JOIN  extension.TeacherCandidateTeacherPreparationProviderAssociation TCTPPA ON TC.TeacherCandidateIdentifier = TCTPPA.TeacherCandidateIdentifier&#xA;        LEFT JOIN edfi.Staff s ON TC.TeacherCandidateIdentifier = S.StaffUniqueId;" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
           </DTS:ObjectData>
         </DTS:Executable>
         <DTS:Executable
@@ -17478,12 +17553,8 @@ AcademicSubjectDescriptorId  ASC</property>
                       UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor">SELECT  TeacherCandidateIdentifier ,
         TTC.EducationOrganizationId ,
 		TTC.AcademicSubjectDescriptorId ,
-        MAX(CASE WHEN FoundTeaching = 'NOTTEACHING'
-                      AND Status = 'ADMITTEDANDTESTED' AND [Pass-fail] = 'P' THEN '1'  --Numerator
-				 WHEN FoundTeaching = 'NOTTEACHING'
-                      AND Status IN ( 'ADMITTEDANDTESTED' )
-                 THEN '0' --Denom
-                 
+        MAX(CASE WHEN [Pass-fail] = 'P' THEN '1'  --Numerator
+				 WHEN [Pass-fail] = 'F' THEN '0' --Denom             
             END) Value
 FROM    staging.TEMPTeacherCandidateStaffStudentAssessments TTC
         JOIN ( SELECT   SA.AcademicSubjectDescriptorId ,
@@ -17497,6 +17568,8 @@ FROM    staging.TEMPTeacherCandidateStaffStudentAssessments TTC
                     AND a.AdministrationDate = TTC.AdministrationDate
 WHERE   AcademicSubjectDescription LIKE '%BASIC SKILLS%'
         AND [FileStatus] = 'Admissions'
+		AND FoundTeaching = 'NOTTEACHING'
+        AND Status = 'ADMITTEDANDTESTED'
 		AND EntryDate BETWEEN CAST(( SELECT  CAST(SchoolYear - 2 AS NVARCHAR(5))
                                             FROM    edfi.SchoolYearType
                                             WHERE   currentschoolyear = 1
@@ -25546,7 +25619,7 @@ LEFT JOIN edfi.Staff S ON TC.TeacherCandidateIdentifier = S.StaffUniqueId
 JOIN extension.TeacherCandidateTeacherPreparationProviderAssociation TCTPPA ON TC.TeacherCandidateIdentifier = TCTPPA.TeacherCandidateIdentifier
 INNER JOIN edfi.StaffSchoolAssociation SSeA ON SSeA.StaffUSI = S.StaffUSI --AND SSeA.SchoolId = TCTPPA.TeacherPreparationProviderId
 --LEFT JOIN edfi.Staff S1 ON TC.TeacherCandidateIdentifier = S1.StaffUniqueId
-LEFT JOIN edfi.StaffEvaluationInformation SE ON SE.StaffUSI = SSeA.StaffUSI AND SSeA.SchoolYear=SE.EvaluationSchoolYear
+LEFT JOIN edfi.StaffEvaluationInformation SE ON SE.StaffUSI = SSeA.StaffUSI AND SE.EvaluationSchoolYear=SSeA.SchoolYear
 WHERE [FileStatus] = 'Completers' 
 AND ExitWithdrawDate BETWEEN CAST(( SELECT  CAST(SchoolYear - 3 AS NVARCHAR(5))
                                             FROM    edfi.SchoolYearType
@@ -25556,7 +25629,7 @@ AND ExitWithdrawDate BETWEEN CAST(( SELECT  CAST(SchoolYear - 3 AS NVARCHAR(5))
                                             FROM    edfi.SchoolYearType
                                             WHERE   currentschoolyear = 1
                                           ) + '-07-01' AS DATE)
-AND SSeA.SchoolYear= (SELECT  CAST(SchoolYear AS NVARCHAR(5))
+AND SSeA.SchoolYear = (SELECT  CAST(SchoolYear AS NVARCHAR(5))
                                             FROM    edfi.SchoolYearType
                                             WHERE   currentschoolyear = 1
                                           )
@@ -26241,7 +26314,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="160,102"
+          PanelSize="160,103"
           Size="160,146"
           Id="Package\District Metrics"
           TopLeft="1191,1028.5" />
@@ -26405,7 +26478,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="158,102"
+          PanelSize="158,103"
           Size="158,146"
           Id="Package\School Metrics"
           TopLeft="1625,1028.5" />
@@ -26416,7 +26489,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="152,102"
+          PanelSize="152,103"
           Size="152,146"
           Id="Package\State Metrics"
           TopLeft="1412,1028.5" />
@@ -26985,7 +27058,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
         <ContainerLayout
           HeaderHeight="43"
           IsExpanded="True"
-          PanelSize="2965,204"
+          PanelSize="2965,205"
           Size="2965,248"
           Id="Package\TeacherCandidate level Metrics"
           TopLeft="5.5,720.5" />
@@ -27200,47 +27273,47 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="143,42"
+          Size="143.2,41.6"
           Id="Package\Custom rollups\Metric 10005\Metric Source"
           TopLeft="216,5.5" />
         <NodeLayout
-          Size="150,42"
+          Size="148.8,41.6"
           Id="Package\Custom rollups\Metric 10005\Staging Source"
           TopLeft="5.50000000000003,5.5" />
         <NodeLayout
-          Size="168,42"
+          Size="168,41.6"
           Id="Package\Custom rollups\Metric 10005\Merge Join metrics"
           TopLeft="203.5,107.5" />
         <NodeLayout
-          Size="204,42"
+          Size="204,41.6"
           Id="Package\Custom rollups\Metric 10005\MetricInstance Destination"
           TopLeft="185.5,209.5" />
         <EdgeLayout
           Id="Package\Custom rollups\Metric 10005.Paths[OLE DB Source Output1]"
-          TopLeft="80.5,47.5">
+          TopLeft="79.9,47.1">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="180.333333333333,60"
+              EndConnector="180.933333333333,60.4"
               Start="0,0"
-              End="180.333333333333,52.5">
+              End="180.933333333333,52.9">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,31.6603773584906" />
+                    End="0,31.8981132075472" />
                   <mssgle:CubicBezierSegment
-                    Point1="0,31.6603773584906"
-                    Point2="0,35.6603773584906"
-                    Point3="4,35.6603773584906" />
+                    Point1="0,31.8981132075472"
+                    Point2="0,35.8981132075472"
+                    Point3="4,35.8981132075472" />
                   <mssgle:LineSegment
-                    End="176.333333333333,35.6603773584906" />
+                    End="176.933333333333,35.8981132075472" />
                   <mssgle:CubicBezierSegment
-                    Point1="176.333333333333,35.6603773584906"
-                    Point2="180.333333333333,35.6603773584906"
-                    Point3="180.333333333333,39.6603773584906" />
+                    Point1="176.933333333333,35.8981132075472"
+                    Point2="180.933333333333,35.8981132075472"
+                    Point3="180.933333333333,39.8981132075472" />
                   <mssgle:LineSegment
-                    End="180.333333333333,52.5" />
+                    End="180.933333333333,52.9" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -27347,7 +27420,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\Custom rollups\Metric 20005">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="204,42"
           Id="Package\Custom rollups\Metric 20005\MetricInstance Destination"
@@ -27375,9 +27448,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -27397,15 +27468,15 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="288,42"
+          Size="288,41.6"
           Id="Package\Custom rollups\Metric 20023\MetricInstanceExtendedProperty Destination"
           TopLeft="5.50000000000003,209.5" />
         <NodeLayout
-          Size="169,42"
+          Size="168.8,41.6"
           Id="Package\Custom rollups\Metric 20023\Source EPP Metrics"
           TopLeft="65,5.5" />
         <NodeLayout
-          Size="257,42"
+          Size="256.8,41.6"
           Id="Package\Custom rollups\Metric 20023\Lookup TeacherPreparationProviderId"
           TopLeft="21,107.5" />
         <EdgeLayout
@@ -27427,7 +27498,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -27507,15 +27580,15 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="288,42"
+          Size="288,41.6"
           Id="Package\Custom rollups\Metric 20024\MetricInstanceExtendedProperty Destination"
           TopLeft="5.50000000000003,209.5" />
         <NodeLayout
-          Size="169,42"
+          Size="168.8,41.6"
           Id="Package\Custom rollups\Metric 20024\Source EPP Metrics"
           TopLeft="65,5.5" />
         <NodeLayout
-          Size="257,42"
+          Size="256.8,41.6"
           Id="Package\Custom rollups\Metric 20024\Lookup TeacherPreparationProviderId"
           TopLeft="21,107.5" />
         <EdgeLayout
@@ -27537,9 +27610,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -27596,39 +27667,37 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="288,42"
+          Size="288,41.6"
           Id="Package\Custom rollups\Metric 20025\MetricInstanceExtendedProperty Destination"
           TopLeft="5.50000000000003,209.5" />
         <NodeLayout
-          Size="169,42"
+          Size="168,41.6"
           Id="Package\Custom rollups\Metric 20025\Source EPP Metrics"
           TopLeft="65,5.5" />
         <NodeLayout
-          Size="257,42"
+          Size="256.8,41.6"
           Id="Package\Custom rollups\Metric 20025\Lookup TeacherPreparationProviderId"
           TopLeft="21,107.5" />
         <EdgeLayout
           Id="Package\Custom rollups\Metric 20025.Paths[OLE DB Source Output]"
-          TopLeft="149.5,47.5">
+          TopLeft="149.2,47.1">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
-              EndConnector="0,60"
+              EndConnector="0,60.4"
               Start="0,0"
-              End="0,52.5">
+              End="0,52.9">
               <mssgle:Curve.Segments>
                 <mssgle:SegmentCollection
                   Capacity="5">
                   <mssgle:LineSegment
-                    End="0,52.5" />
+                    End="0,52.9" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -27685,15 +27754,15 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="204,42"
+          Size="204,41.6"
           Id="Package\Custom rollups\Metric 20026\MetricInstance Destination"
           TopLeft="32,209.5" />
         <NodeLayout
-          Size="257,42"
+          Size="256.8,41.6"
           Id="Package\Custom rollups\Metric 20026\Lookup TeacherPreparationProviderId"
           TopLeft="5.5,107.5" />
         <NodeLayout
-          Size="169,42"
+          Size="168.8,41.6"
           Id="Package\Custom rollups\Metric 20026\Source EPP Metrics"
           TopLeft="49.5,5.5" />
         <EdgeLayout
@@ -27715,9 +27784,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -27866,7 +27933,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\Custom rollups\Metric 20029, 20030">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="204,42"
           Id="Package\Custom rollups\Metric 20029, 20030\MetricInstance Destination"
@@ -27902,9 +27969,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -27926,9 +27991,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -27980,7 +28043,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\Custom rollups\Metric 20031">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
           Size="164,42"
           Id="Package\Custom rollups\Metric 20031\Source TC Metrics"
@@ -28008,7 +28071,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -28039,7 +28104,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\Custom rollups\Metric 40028">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="204,42"
           Id="Package\Custom rollups\Metric 40028\MetricInstance Destination"
@@ -28075,9 +28140,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -28099,9 +28162,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -28123,11 +28184,24 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
       </Property>
     </Properties>
   </PipelineComponentMetadata>
+  <PipelineComponentMetadata
+    design-time-name="Package\Custom rollups\Metric 40028\MetricInstanceExtendedProperty Destination">
+    <Properties>
+      <Property>
+        <Name>DataSourceViewID</Name>
+      </Property>
+      <Property>
+        <Name>TableInfoObjectType</Name>
+        <Value
+          type="q2:string">Table</Value>
+      </Property>
+    </Properties>
+  </PipelineComponentMetadata>
   <TaskHost
     design-time-name="Package\Custom rollups\Metric 40029, 40030">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="204,42"
           Id="Package\Custom rollups\Metric 40029, 40030\MetricInstance Destination"
@@ -28163,9 +28237,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -28187,9 +28259,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -28215,7 +28285,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\Custom rollups\Metric X0018">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="183,42"
           Id="Package\Custom rollups\Metric X0018\MetricInstance Source"
@@ -28243,9 +28313,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -29295,7 +29363,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -29317,7 +29387,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -29363,7 +29435,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -29397,7 +29471,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -29431,7 +29507,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -29465,7 +29543,9 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <EdgeLabelCollection />
+            <mssgm:EdgeLabel
+              BoundingBox="0,0,0,0"
+              RelativePosition="Any" />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -30632,7 +30712,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\TeacherCandidate level Metrics\Metric 10002">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="204,42"
           Id="Package\TeacherCandidate level Metrics\Metric 10002\MetricInstance Destination"
@@ -30680,9 +30760,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -30716,9 +30794,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -30740,9 +30816,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -30917,7 +30991,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\TeacherCandidate level Metrics\Metric 10004">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="204,42"
           Id="Package\TeacherCandidate level Metrics\Metric 10004\MetricInstance Destination"
@@ -30965,9 +31039,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -31001,9 +31073,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -31025,9 +31095,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -31513,7 +31581,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\TeacherCandidate level Metrics\Metric 10009">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="143,42"
           Id="Package\TeacherCandidate level Metrics\Metric 10009\Metric Source"
@@ -31561,9 +31629,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -31597,9 +31663,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -31621,9 +31685,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -31960,7 +32022,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
     design-time-name="Package\TeacherCandidate level Metrics\Metric 10012">
     <LayoutInfo>
       <GraphLayout
-        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="150.4,41.6"
           Id="Package\TeacherCandidate level Metrics\Metric 10012\Staging Source"
@@ -31996,9 +32058,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -32032,9 +32092,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
@@ -32068,9 +32126,7 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
@@ -32111,19 +32167,19 @@ ORDER BY tc.TeacherCandidateIdentifier ASC ,
       <GraphLayout
         Capacity="8" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
         <NodeLayout
-          Size="150.4,41.6"
+          Size="150,42"
           Id="Package\TeacherCandidate level Metrics\Metric 10013\Staging Source"
           TopLeft="4.70000000000003,5.5" />
         <NodeLayout
-          Size="143.2,41.6"
+          Size="143,42"
           Id="Package\TeacherCandidate level Metrics\Metric 10013\Metric Source"
           TopLeft="216,5.5" />
         <NodeLayout
-          Size="204,41.6"
+          Size="204,42"
           Id="Package\TeacherCandidate level Metrics\Metric 10013\MetricInstance Destination"
           TopLeft="185.5,209.5" />
         <NodeLayout
-          Size="168,41.6"
+          Size="168,42"
           Id="Package\TeacherCandidate level Metrics\Metric 10013\Merge Join metrics"
           TopLeft="203.5,107.5" />
         <EdgeLayout
